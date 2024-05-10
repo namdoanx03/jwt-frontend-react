@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import './Login.scss'
 import { useHistory } from "react-router-dom";
 import { toast } from 'react-toastify';
@@ -20,7 +20,7 @@ const Login = (props) => {
     const handleCreateNewAccount = () => {
         history.push("/register");
     }
-    const hanleLogin = async() => {
+    const handleLogin = async() => {
         setObjValidInput(defaultObjValidInput)
         if(!valueLogin){
             setObjValidInput({...defaultObjValidInput, isValidValueLogin: false})
@@ -41,6 +41,7 @@ const Login = (props) => {
             }
             sessionStorage.setItem("account", JSON.stringify(data));
             history.push("/users")
+            window.location.reload()
         }
         if (response && response.data && +response.data.EC !== 0) {
             //error
@@ -48,6 +49,20 @@ const Login = (props) => {
         }
         console.log("check response: ", response.data)
     }
+
+    const handlePressEnter = (event) => {
+        if(event.charCode === 13 && event.code === "Enter"){
+           handleLogin()
+        }
+    }
+    useEffect(()=>{
+        let session = sessionStorage.getItem("account");
+        if (session) {
+            history.push("/")
+            window.location.reload()
+        }
+    }, [])
+    
     return (
         <div className="login-container " >
             <div className="container">
@@ -75,8 +90,9 @@ const Login = (props) => {
                             placeholder='Password'
                             value={password} 
                             onChange={(event) => { setPassword(event.target.value) }}
+                            onKeyPress = {(event) => handlePressEnter(event)}
                                 />
-                        <button className='btn btn-primary' onClick={() => hanleLogin()}>Login</button>
+                        <button className='btn btn-primary' onClick={() => handleLogin()}>Login</button>
                         <span className='text-center'>
                             <a className='forgot-password' href='#'>Forget your password?</a>
                             </span>
